@@ -1,0 +1,23 @@
+---
+layout: post
+title: "My Test R stuff"
+categories: rlang
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(eval = TRUE)
+knitr::opts_chunk$set(fig.path = "images/")
+knitr::opts_knit$set(out.format = "jekyll")
+```
+
+Well, does this work? Let's test some output:
+
+```{r}
+runif(100)
+```
+
+How about plots?
+
+```{r}
+plot(1:10, runif(10), col = "orange")
+```

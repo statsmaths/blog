@@ -103,7 +103,7 @@ such as this:
 
 Drew a box around any detected faces, and saved the output as this:
 
-![search results](img/img07.png)
+![search results](https://statsmaths.github.io/blog/assets/2017-06-08-dtv-face-detection/img07.png)
 
 With only a slight tweak of the code, I also decided to save a version
 of just the face into a seperate file. In our example, the extracted

@@ -5,11 +5,10 @@ categories: rlang
 ---
 
 
+
 ```{r setup, include=FALSE}
-# CRAN will not have spaCy installed, so create static vignette
 knitr::opts_chunk$set(eval = TRUE)
-knitr::opts_chunk$set(fig.path = "images/")
-knitr::opts_knit$set(out.format = "jekyll")
+knitr::opts_chunk$set(fig.path = "../assets/2017-07-01-state-of-the-union-case-study/")
 ```
 
 In this vignette, the utility of the package is illustrated by showing how it can be
@@ -22,7 +21,7 @@ the piping notation of **magrittr** and **ggplot2** graphics. These are used bec
 best illustrate the advantages of the tidy data model that has been built in **cleanNLP**
 for representing corpus annotations.
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, message = FALSE}
 library(magrittr)
 library(ggplot2)
 library(cleanNLP)

@@ -6,8 +6,7 @@ categories: rlang
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(eval = TRUE)
-knitr::opts_chunk$set(fig.path = "images/")
-knitr::opts_knit$set(out.format = "jekyll")
+knitr::opts_chunk$set(fig.path = "../assets/2017-07-31-r-test/")
 ```
 
 Well, does this work? Let's test some output:

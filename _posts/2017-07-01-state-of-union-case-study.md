@@ -4,48 +4,54 @@ title: "Exploring the State of the Union Addresses: A Case Study with cleanNLP"
 categories: rlang
 ---
 
-In this vignette, the utility of the package is illustrated by showing how it can be used to study a corpus consisting of every State of the Union Address made by a United States president through 2016. It highlights some of the major benefits of the tidy datamodel as it applies to the study of textual data, though by no means attempts to give an exhaustive coverage of all the available tables and approaches. The examples make heavy use of the table verbs provided by **dplyr**, the piping notation of **magrittr** and **ggplot2** graphics. These are used because they best illustrate the advantages of the tidy data model that has been built in **cleanNLP** for representing corpus annotations.
 
-    ## Loading required package: dplyr
 
-    ## 
-    ## Attaching package: 'dplyr'
 
-    ## The following objects are masked from 'package:stats':
-    ## 
-    ##     filter, lag
 
-    ## The following objects are masked from 'package:base':
-    ## 
-    ##     intersect, setdiff, setequal, union
+In this vignette, the utility of the package is illustrated by showing how it can be
+used to study a corpus consisting of every
+State of the Union Address made by a United States president through 2016. It
+highlights some of the major benefits of the tidy datamodel as it applies to the study of
+textual data, though by no means attempts to give an exhaustive coverage of all the available
+tables and approaches. The examples make heavy use of the table verbs provided by **dplyr**,
+the piping notation of **magrittr** and **ggplot2** graphics. These are used because they
+best illustrate the advantages of the tidy data model that has been built in **cleanNLP**
+for representing corpus annotations.
 
-    ## Loading required package: readr
 
-    ## 
-    ## Attaching package: 'cleanNLP'
 
-    ## The following object is masked from 'package:ggplot2':
-    ## 
-    ##     annotate
+## Exploratory Analysis
 
-Exploratory Analysis
---------------------
+Simple summary statistics are easily computed off of the token table. To see
+the distribution of sentence length, the token table is grouped by the document
+and sentence id and the number of rows within each group are computed. The percentiles
+of these counts give a quick summary of the distribution.
 
-Simple summary statistics are easily computed off of the token table. To see the distribution of sentence length, the token table is grouped by the document and sentence id and the number of rows within each group are computed. The percentiles of these counts give a quick summary of the distribution.
 
-``` r
+{% highlight r %}
 get_token(sotu) %>%
   group_by(id, sid) %>%
   summarize(sent_len = n()) %$%
   quantile(sent_len, seq(0,1,0.1))
-```
+{% endhighlight %}
 
-    ##   0%  10%  20%  30%  40%  50%  60%  70%  80%  90% 100% 
-    ##    2   12   16   20   24   28   32   37   45   57  679
 
-The median sentence has 28 tokens, whereas at least one has over 600 (this is due to a bulleted list in one of the written addresses being treated as a single sentence) To see the most frequently used nouns in the dataset, the token table is filtered on the universal part of speech field, grouped by lemma, and the number of rows in each group are once again calculated. Sorting the output and selecting the top 42 nouns, yields a high level summary of the topics of interest within this corpus.
 
-``` r
+{% highlight text %}
+##   0%  10%  20%  30%  40%  50%  60%  70%  80%  90% 100% 
+##    1   11   15   19   23   27   31   36   44   56  678
+{% endhighlight %}
+
+The median sentence has 28 tokens, whereas at least one has over 600 (this is
+due to a bulleted list in one of the written addresses being treated as a single sentence)
+To see the most frequently used
+nouns in the dataset, the token table is filtered on the universal part of speech field, grouped
+by lemma, and the number of rows in each group are once again calculated. Sorting the output and
+selecting the top $42$ nouns, yields a high level summary of the topics of interest within this
+corpus.
+
+
+{% highlight r %}
 get_token(sotu) %>%
   filter(upos == "NOUN") %>%
   group_by(lemma) %>%
@@ -53,302 +59,291 @@ get_token(sotu) %>%
   top_n(n = 42, count) %>%
   arrange(desc(count)) %>%
   use_series(lemma)
-```
+{% endhighlight %}
 
-    ##  [1] "year"        "government"  "States"      "Congress"    "United"     
-    ##  [6] "country"     "people"      "law"         "nation"      "time"       
-    ## [11] "power"       "interest"    "war"         "world"       "citizen"    
-    ## [16] "service"     "duty"        "system"      "part"        "state"      
-    ## [21] "peace"       "program"     "man"         "America"     "policy"     
-    ## [26] "condition"   "act"         "work"        "legislation" "force"      
-    ## [31] "effort"      "treaty"      "purpose"     "Federal"     "business"   
-    ## [36] "land"        "subject"     "action"      "Department"  "measure"    
-    ## [41] "way"         "tax"
 
-The result is generally as would be expected from a corpus of government speeches, with references to proper nouns representing various organizations within the government and non-proper nouns indicating general topics of interest such as `tax'',`law'', and \`\`peace''.
 
-The length in tokens of each address is calculated similarly by grouping and summarizing at the document id level. The results can be joined with the document table to get the year of the speech and then piped in a **ggplot2** command to illustrate how the length of the State of the Union has changed over time.
+{% highlight text %}
+##  [1] "year"        "government"  "States"      "Congress"    "United"     
+##  [6] "country"     "people"      "law"         "nation"      "time"       
+## [11] "power"       "interest"    "war"         "world"       "citizen"    
+## [16] "service"     "duty"        "system"      "part"        "state"      
+## [21] "peace"       "program"     "man"         "America"     "policy"     
+## [26] "condition"   "act"         "work"        "legislation" "force"      
+## [31] "effort"      "treaty"      "purpose"     "Federal"     "business"   
+## [36] "land"        "subject"     "action"      "Department"  "measure"    
+## [41] "way"         "tax"
+{% endhighlight %}
 
-``` r
+The result is generally as would be expected from a corpus of government speeches, with
+references to proper nouns representing various organizations within the government and
+non-proper nouns indicating general topics of interest such as ``tax'', ``law'', and
+``peace''.
+
+The length in tokens of each address is calculated similarly by grouping and summarizing at
+the document id level. The results can be joined with the document table to get the year
+of the speech and then piped in a **ggplot2** command to illustrate how the length of
+the State of the Union has changed over time.
+
+
+{% highlight r %}
 get_token(sotu) %>%
   group_by(id) %>%
   summarize(n = n()) %>%
-  left_join(get_document(sotu)) %>%
+  left_join(get_document(sotu), by = "id") %>%
   ggplot(aes(year, n)) +
     geom_line(color = grey(0.8)) +
     geom_point(aes(color = sotu_type)) +
-    geom_smooth()
-```
+    geom_smooth(method = 'loess')
+{% endhighlight %}
 
-    ## Joining, by = "id"
+![plot of chunk unnamed-chunk-4](../assets/2017-07-01-state-of-the-union-case-study/unnamed-chunk-4-1.png)
 
-    ## `geom_smooth()` using method = 'loess'
+Here, color is used to represent whether the address was given as an oral address or a written
+document. The output shows that their are certainly time trends
+to the address length, with the form of the address (written versus spoken) also having a large
+effect on document length.
 
-![](https://statsmaths.github.io/blog/assets/2017-07-01-state-of-union-case-study/unnamed-chunk-4-1.png)
+Finding the most used entities from the entity table over the time period of the corpus yields an
+alternative way to see the underlying topics. A slightly modified version of the code
+snippet used to find the top nouns in the dataset can be used to find the top entities. The
+``get_token`` function is replaced by ``get_entity`` and the table is filtered on ``entity_type``
+rather than the universal part of speech code.
 
-Here, color is used to represent whether the address was given as an oral address or a written document. The output shows that their are certainly time trends to the address length, with the form of the address (written versus spoken) also having a large effect on document length.
 
-Finding the most used entities from the entity table over the time period of the corpus yields an alternative way to see the underlying topics. A slightly modified version of the code snippet used to find the top nouns in the dataset can be used to find the top entities. The `get_token` function is replaced by `get_entity` and the table is filtered on `entity_type` rather than the universal part of speech code.
-
-``` r
+{% highlight r %}
 get_entity(sotu) %>%
   filter(entity_type == "LOCATION") %>%
   group_by(entity) %>%
   summarize(count = n()) %>%
-  top_n(n = 44) %>%
+  top_n(n = 44, count) %>%
   arrange(desc(count)) %>%
   use_series(entity)
-```
+{% endhighlight %}
 
-    ## Selecting by count
 
-    ##  [1] "United States"        "America"              "States"              
-    ##  [4] "Mexico"               "Great Britain"        "Spain"               
-    ##  [7] "Europe"               "China"                "Washington"          
-    ## [10] "France"               "Cuba"                 "Texas"               
-    ## [13] "Japan"                "Pacific"              "Russia"              
-    ## [16] "Republic"             "Soviet Union"         "Germany"             
-    ## [19] "Nicaragua"            "California"           "District of Columbia"
-    ## [22] "Mississippi"          "Alaska"               "Asia"                
-    ## [25] "Africa"               "Iraq"                 "Atlantic"            
-    ## [28] "New York"             "U.S."                 "Panama"              
-    ## [31] "Philippines"          "Middle East"          "Canada"              
-    ## [34] "Afghanistan"          "Paris"                "Brazil"              
-    ## [37] "Central America"      "Kansas"               "Oregon"              
-    ## [40] "Iran"                 "Peru"                 "Italy"               
-    ## [43] "London"               "Colombia"             "Korea"               
-    ## [46] "Venezuela"
 
-The ability to redo analyses from a slightly different perspective is a direct consequence of the tidy data model supplied by **cleanNLP**. The top locations include some obvious and some less obvious instances. Those sovereign nations included such as Great Britain, Mexico, Germany, and Japan seem as expected given either the United State's close ties or periods of war with them. The top states include the most populous regions (New York, California, and Texas) but also smaller states (Kansas, Oregon, Mississippi), the latter being more surprising.
+{% highlight text %}
+##  [1] "United States"        "America"              "States"              
+##  [4] "Mexico"               "Great Britain"        "Spain"               
+##  [7] "Europe"               "China"                "Washington"          
+## [10] "France"               "Cuba"                 "Texas"               
+## [13] "Japan"                "Pacific"              "Russia"              
+## [16] "Republic"             "Soviet Union"         "Germany"             
+## [19] "Nicaragua"            "California"           "District of Columbia"
+## [22] "Mississippi"          "Alaska"               "Asia"                
+## [25] "Africa"               "Iraq"                 "Atlantic"            
+## [28] "New York"             "U.S."                 "Panama"              
+## [31] "Philippines"          "Middle East"          "Canada"              
+## [34] "Afghanistan"          "Paris"                "Brazil"              
+## [37] "Central America"      "Kansas"               "Oregon"              
+## [40] "Iran"                 "Peru"                 "Italy"               
+## [43] "London"               "Colombia"             "Korea"               
+## [46] "Venezuela"
+{% endhighlight %}
 
-One of the most straightforward way of extracting a high-level summary of the content of a speech is to extract all direct object object dependencies where the target noun is not a very common word. In order to do this for a particular speech, the dependency table is joined to the document table, a particular document is selected, and relationships of type `dobj'' (direct object) are filtered out. The result is then joined to the data set`word\_frequency\`\`, which is included with **cleanNLP**, and pairs with a target occurring less than 0.5% of the time are selected to give the final result. Here is an example of this using the first address made by George W. Bush in 2001:
+The ability to redo analyses from a slightly different perspective is a direct consequence of
+the tidy data model supplied by **cleanNLP**.
+The top locations include some obvious and some less obvious instances.
+Those sovereign nations included such as Great Britain, Mexico, Germany, and Japan seem
+as expected given either the United State's close ties or periods of war with them. The top states
+include the most populous regions (New York, California, and Texas) but also smaller
+states (Kansas, Oregon, Mississippi), the latter being more surprising.
 
-``` r
+One of the most straightforward way of extracting a high-level summary of the content of a speech
+is to extract all direct object object dependencies where the target noun is not a very common word.
+In order to do this for a particular speech, the dependency table is joined to the document table,
+a particular document is selected, and relationships of type ``dobj'' (direct object)
+are filtered out. The result is then joined to the data set ``word\_frequency``, which is
+included with **cleanNLP**, and pairs with a target occurring less than 0.5\% of the time
+are selected to give the final result. Here is an example of this using the first address made
+by George W. Bush in 2001:
+
+
+{% highlight r %}
 get_dependency(sotu, get_token = TRUE) %>%
-  left_join(get_document(sotu)) %>%
+  left_join(get_document(sotu), by = c("id")) %>%
   filter(year == 2001) %>%
   filter(relation == "dobj") %>%
   select(id = id, start = word, word = lemma_target) %>%
-  left_join(word_frequency) %>%
+  left_join(word_frequency, by = c("word")) %>%
   filter(frequency < 0.0005) %>%
   select(id, start, word) %$%
   sprintf("%s => %s", start, word)
-```
+{% endhighlight %}
 
-    ## Joining, by = c("id", "sid", "tid")
 
-    ## Joining, by = c("id", "sid", "tid_target")
 
-    ## Joining, by = "id"
+{% highlight text %}
+##  [1] "take => oath"                  "help => disadvantaged"        
+##  [3] "fight => homelessness"         "fight => illiteracy"          
+##  [5] "end => profiling"              "throw => darts"               
+##  [7] "promoting => internationalism" "makes => downpayment"         
+##  [9] "discard => relic"              "sound => footing"             
+## [11] "minding => manners"
+{% endhighlight %}
 
-    ## Joining, by = "word"
+Most of these phrases correspond with the ``compassionate conservatism" that George W. Bush ran
+under in the preceding 2000 election. Applying the same analysis to the 2002 State of the Union,
+which came under the shadow of the September 11th terrorist attacks, shows a drastic shift
+in focus.
 
-    ##  [1] "take => oath"                  "help => disadvantaged"        
-    ##  [3] "fight => homelessness"         "fight => illiteracy"          
-    ##  [5] "end => profiling"              "throw => darts"               
-    ##  [7] "promoting => internationalism" "makes => downpayment"         
-    ##  [9] "discard => relic"              "sound => footing"             
-    ## [11] "minding => manners"
 
-Most of these phrases correspond with the \`\`compassionate conservatism" that George W. Bush ran under in the preceding 2000 election. Applying the same analysis to the 2002 State of the Union, which came under the shadow of the September 11th terrorist attacks, shows a drastic shift in focus.
-
-``` r
+{% highlight r %}
 get_dependency(sotu, get_token = TRUE) %>%
-  left_join(get_document(sotu)) %>%
+  left_join(get_document(sotu), by = c("id")) %>%
   filter(year == 2002) %>%
   filter(relation == "dobj") %>%
   select(id = id, start = word, word = lemma_target) %>%
-  left_join(word_frequency) %>%
+  left_join(word_frequency, by = c("word")) %>%
   filter(frequency < 0.0005) %>%
   select(id, start, word) %$%
   sprintf("%s => %s", start, word)
-```
+{% endhighlight %}
 
-    ## Joining, by = c("id", "sid", "tid")
 
-    ## Joining, by = c("id", "sid", "tid_target")
 
-    ## Joining, by = "id"
-
-    ## Joining, by = "word"
-
-    ##  [1] "urged => follower"        "brought => sorrow"       
-    ##  [3] "hold => hostage"          "eliminate => parasite"   
-    ##  [5] "flaunt => hostility"      "make => agile"           
-    ##  [7] "fight => anthrax"         "equip => firefighter"    
-    ##  [9] "defeat => recession"      "want => paycheck"        
-    ## [11] "enact => safeguard"       "embracing => ethic"      
-    ## [13] "owns => aspiration"       "containing => resentment"
-    ## [15] "erasing => rivalry"       "embrace => tyranny"
+{% highlight text %}
+##  [1] "urged => follower"        "brought => sorrow"       
+##  [3] "hold => hostage"          "eliminate => parasite"   
+##  [5] "flaunt => hostility"      "make => agile"           
+##  [7] "fight => anthrax"         "equip => firefighter"    
+##  [9] "defeat => recession"      "want => paycheck"        
+## [11] "enact => safeguard"       "embracing => ethic"      
+## [13] "owns => aspiration"       "containing => resentment"
+## [15] "erasing => rivalry"       "embrace => tyranny"
+{% endhighlight %}
 
 Here the topics have almost entirely shifted to counter-terrorism and national security efforts.
 
-Models
-------
+## Models
 
-The `get_tfidf` function provided by **cleanNLP** converts a token table into a sparse matrix representing the term-frequency inverse document frequency matrix (or any intermediate part of that calculation). This is particularly useful when building models from a textual corpus. The `tidy_pca`, also included with the package, takes a matrix and returns a data frame containing the desired number of principal components. Dimension reduction involves piping the token table for a corpus into the `get_tfidif` function and passing the results to `tidy_pca`.
+The ``get_tfidf`` function provided by **cleanNLP** converts a token table into
+a sparse matrix representing the term-frequency inverse document frequency matrix (or
+any intermediate part of that calculation). This is particularly useful when building
+models from a textual corpus. The ``tidy_pca``, also included with the package,
+takes a matrix and returns a data frame containing the desired number of principal
+components. Dimension reduction involves piping the token table for a corpus
+into the ``get_tfidif`` function and passing the results to ``tidy_pca``.
 
-``` r
+
+{% highlight r %}
 library(methods)
 pca <- get_token(sotu) %>%
   filter(pos %in% c("NN", "NNS")) %>%
   get_tfidf(min_df = 0.05, max_df = 0.95, type = "tfidf", tf_weight = "dnorm") %$%
   tidy_pca(tfidf, get_document(sotu))
-```
+{% endhighlight %}
 
-In this example only non-proper nouns have been included in order to minimize the stylistic attributes of the speeches in order to focus more on their content. A scatter plot of the speeches using these components is shown. There is a definitive temporal pattern to the documents, with the 20th century addresses forming a distinct cluster on the right side of the plot.
+In this example only non-proper nouns have been included in order to minimize the
+stylistic attributes of the speeches in order to focus more on their content.
+A scatter plot of the speeches using these components is shown.
+There is a definitive temporal pattern to the documents, with the
+20th century addresses forming a distinct cluster on the right side of the plot.
 
-The output of the `get_tfidf` function may be given directly to the `LDA` function in the package **topicmodels**. The topic model function requires raw counts, so the type variable in `get_tfidf` is set to `tf`; the results may then be directly piped to `LDA`.
+The output of the ``get_tfidf`` function may be given directly to the ``LDA``
+function in the package **topicmodels**. The topic model function requires raw
+counts, so the type variable in ``get_tfidf`` is set to ``tf``; the results may
+then be directly piped to ``LDA``.
 
-``` r
+
+{% highlight r %}
 library(topicmodels)
 tm <- get_token(sotu) %>%
   filter(pos %in% c("NN", "NNS")) %>%
   get_tfidf(min_df = 0.05, max_df = 0.95, type = "tf", tf_weight = "raw") %$%
-  LDA(tf, k = 16, control = list(verbose = 1))
-```
-
-    ## **** em iteration 1 ****
-    ## document 236
-    ## new alpha = 2.97317
-    ## **** em iteration 2 ****
-    ## document 236
-    ## new alpha = 1.13252
-    ## **** em iteration 3 ****
-    ## document 236
-    ## new alpha = 0.41387
-    ## **** em iteration 4 ****
-    ## document 236
-    ## new alpha = 0.19929
-    ## **** em iteration 5 ****
-    ## document 236
-    ## new alpha = 0.11941
-    ## **** em iteration 6 ****
-    ## document 236
-    ## new alpha = 0.08763
-    ## **** em iteration 7 ****
-    ## document 236
-    ## new alpha = 0.07111
-    ## **** em iteration 8 ****
-    ## document 236
-    ## new alpha = 0.06147
-    ## **** em iteration 9 ****
-    ## document 236
-    ## new alpha = 0.05492
-    ## **** em iteration 10 ****
-    ## document 236
-    ## new alpha = 0.04987
-    ## **** em iteration 11 ****
-    ## document 236
-    ## new alpha = 0.04601
-    ## **** em iteration 12 ****
-    ## document 236
-    ## new alpha = 0.04301
-    ## **** em iteration 13 ****
-    ## document 236
-    ## new alpha = 0.04062
-    ## **** em iteration 14 ****
-    ## document 236
-    ## new alpha = 0.03861
-    ## **** em iteration 15 ****
-    ## document 236
-    ## new alpha = 0.03687
-    ## **** em iteration 16 ****
-    ## document 236
-    ## new alpha = 0.03535
-    ## **** em iteration 17 ****
-    ## document 236
-    ## new alpha = 0.03409
-    ## **** em iteration 18 ****
-    ## document 236
-    ## new alpha = 0.03298
-    ## **** em iteration 19 ****
-    ## document 236
-    ## new alpha = 0.03207
-    ## **** em iteration 20 ****
-    ## document 236
-    ## new alpha = 0.03128
-    ## **** em iteration 21 ****
-    ## document 236
-    ## new alpha = 0.03059
-    ## **** em iteration 22 ****
-    ## document 236
-    ## new alpha = 0.03000
-    ## **** em iteration 23 ****
-    ## document 236
-    ## new alpha = 0.02952
-    ## final e step document 236
+  LDA(tf, k = 16, control = list(verbose = 0))
+{% endhighlight %}
 
 The topics, ordered by approximate time period, are visualized below:
 
-Most topics persist for a few decades and then largely disappear, though some persist over non-contiguous periods of the presidency. The Energy topic, for example, appears during the 1950s and crops up again during the energy crisis of the 1970s. The "world, man, freedom, force, defense" topic peaks during both World Wars, but is absent during the 1920s and early 1930s.
+Most topics persist for a few decades and then largely disappear, though some persist over
+non-contiguous periods of the presidency. The Energy topic, for example, appears during the
+1950s and crops up again during the energy crisis of the 1970s. The "world, man, freedom,
+force, defense" topic peaks during both World Wars, but is absent during the 1920s and early
+1930s.
 
-Finally, the **cleanNLP** data model is also convenient for building predictive models. The State of the Union corpus does not lend itself to an obviously applicable prediction problem. A classifier that distinguishes speeches made by George W. Bush and Barrack Obama will be constructed here for the purpose of illustration. As a first step, a term-frequency matrix is extracted using the same technique as was used with the topic modeling function. However, here the frequency is computed for each sentence in the corpus rather than the document as a whole. The ability to do this seamlessly with a single additional `mutate` function defining a new id illustrates the flexibility of the `get_tfidf` function.
+Finally, the **cleanNLP** data model is also convenient for building predictive models.
+The State of the Union corpus does not lend itself to an obviously applicable prediction problem.
+A classifier that distinguishes speeches made by George W. Bush and Barrack Obama will be constructed
+here for the purpose of illustration.
+As a first step, a term-frequency matrix is extracted using the same technique as was used with
+the topic modeling function. However, here the frequency is computed for each sentence in the
+corpus rather than the document as a whole. The ability to do this seamlessly with a single
+additional ``mutate`` function defining a new id illustrates the flexibility of the
+``get_tfidf`` function.
 
-``` r
+
+{% highlight r %}
 df <- get_token(sotu) %>%
-  left_join(get_document(sotu)) %>%
+  left_join(get_document(sotu), by = "id") %>%
   filter(year > 2000) %>%
   mutate(new_id = paste(id, sid, sep = "-")) %>%
   filter(pos %in% c("NN", "NNS"))
-```
-
-    ## Joining, by = "id"
-
-``` r
 mat <- get_tfidf(df, min_df = 0, max_df = 1, type = "tf",
                  tf_weight = "raw", doc_var = "new_id")
-```
+{% endhighlight %}
 
-It will be necessary to define a response variable `y` indicating whether this is a speech made by President Obama as well as a training flag indicating which speeches were made in odd numbered years. This is done via a separate table join and a pair of mutations.
+It will be necessary to define a response variable ``y`` indicating whether this is a
+speech made by President Obama as well as a training flag indicating which speeches were
+made in odd numbered years. This is done via a separate table join and a pair of mutations.
 
-``` r
+
+{% highlight r %}
 meta <- data_frame(new_id = mat$id) %>%
-  left_join(df[!duplicated(df$new_id),]) %>%
+  left_join(df[!duplicated(df$new_id),], by = "new_id") %>%
   mutate(y = as.numeric(president == "Barack Obama")) %>%
   mutate(train = year %in% seq(2001,2016, by = 2))
-```
+{% endhighlight %}
 
-    ## Joining, by = "new_id"
+The output may now be used as input to the elastic net function provided
+by the **glmnet** package. The response is set to the binomial family
+given the binary nature of the response and training is done on only those speeches
+occurring in odd-numbered years. Cross-validation is used in order to select the
+best value of the model's tuning parameter.
 
-The output may now be used as input to the elastic net function provided by the **glmnet** package. The response is set to the binomial family given the binary nature of the response and training is done on only those speeches occurring in odd-numbered years. Cross-validation is used in order to select the best value of the model's tuning parameter.
 
-``` r
+{% highlight r %}
 library(glmnet)
-```
-
-    ## Loading required package: Matrix
-
-    ## Loading required package: foreach
-
-    ## Loaded glmnet 2.0-5
-
-``` r
-model <- cv.glmnet(mat$tf[meta$train,], meta$y[meta$train], family = "binomial")
-```
+model <- cv.glmnet(mat$tf[meta$train,],
+                   meta$y[meta$train], family = "binomial")
+{% endhighlight %}
 
 A boxplot of the predicted classes for each address is given below:
 
-The algorithm does a very good job of separating the speeches. Looking at the odd years versus even years (the training and testing sets, respectively) indicates that the model has not been over-fit.
+The algorithm does a very good job of separating the speeches. Looking
+at the odd years versus even years (the training and testing sets, respectively)
+indicates that the model has not been over-fit.
 
-One benefit of the penalized linear regression model is that it is possible to interpret the coefficients in a meaningful way. Here are the non-zero elements of the regression vector, coded as whether the have a positive (more Obama) or negative (more Bush) sign:
+One benefit of the penalized linear regression model is that it is possible to interpret the
+coefficients in a meaningful way. Here are the non-zero elements of the regression vector,
+coded as whether the have a positive (more Obama) or negative (more Bush) sign:
 
-``` r
+
+{% highlight r %}
 beta <- coef(model, s = model[["lambda"]][11])[-1]
 sprintf("%s (%d)", mat$vocab, sign(beta))[beta != 0]
-```
+{% endhighlight %}
 
-    ##  [1] "job (1)"          "business (1)"     "family (1)"      
-    ##  [4] "government (-1)"  "home (1)"         "citizen (-1)"    
-    ##  [7] "terrorist (-1)"   "freedom (-1)"     "education (1)"   
-    ## [10] "college (1)"      "weapon (-1)"      "deficit (1)"     
-    ## [13] "company (1)"      "enemy (-1)"       "peace (-1)"      
-    ## [16] "terror (-1)"      "hope (-1)"        "drug (-1)"       
-    ## [19] "kid (1)"          "regime (-1)"      "crisis (1)"      
-    ## [22] "industry (1)"     "class (1)"        "income (-1)"     
-    ## [25] "need (-1)"        "fact (1)"         "relief (-1)"     
-    ## [28] "bank (1)"         "liberty (-1)"     "society (-1)"    
-    ## [31] "account (-1)"     "duty (-1)"        "folk (1)"        
-    ## [34] "compassion (-1)"  "environment (-1)" "inspector (-1)"
 
-These generally seem as expected given the main policy topics of focus under each administration. During most of the Bush presidency, as mentioned before, the focus was on national security and foreign policy. Obama, on the other hand, inherited the recession of 2008 and was far more focused on the overall economic policy.
+
+{% highlight text %}
+##  [1] "job (1)"          "business (1)"     "family (1)"      
+##  [4] "government (-1)"  "home (1)"         "citizen (-1)"    
+##  [7] "terrorist (-1)"   "freedom (-1)"     "education (1)"   
+## [10] "college (1)"      "weapon (-1)"      "deficit (1)"     
+## [13] "company (1)"      "enemy (-1)"       "peace (-1)"      
+## [16] "terror (-1)"      "hope (-1)"        "drug (-1)"       
+## [19] "kid (1)"          "regime (-1)"      "crisis (1)"      
+## [22] "industry (1)"     "class (1)"        "income (-1)"     
+## [25] "need (-1)"        "fact (1)"         "relief (-1)"     
+## [28] "bank (1)"         "liberty (-1)"     "society (-1)"    
+## [31] "account (-1)"     "duty (-1)"        "folk (1)"        
+## [34] "compassion (-1)"  "environment (-1)" "inspector (-1)"
+{% endhighlight %}
+
+These generally seem as expected given the main policy topics of focus under
+each administration. During most of the Bush presidency, as mentioned
+before, the focus was on national security and foreign policy. Obama, on the other hand,
+inherited the recession of 2008 and was far more focused on the overall economic policy.
+

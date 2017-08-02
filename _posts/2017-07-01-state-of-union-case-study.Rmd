@@ -21,10 +21,12 @@ the piping notation of **magrittr** and **ggplot2** graphics. These are used bec
 best illustrate the advantages of the tidy data model that has been built in **cleanNLP**
 for representing corpus annotations.
 
-```{r, echo = FALSE, message = FALSE}
+```{r, include = FALSE, echo = FALSE, message = FALSE}
 library(magrittr)
 library(ggplot2)
 library(cleanNLP)
+library(dplyr)
+library(methods)
 
 sotu <- readRDS("~/files/sotu/sotu.rds")
 ```
@@ -71,15 +73,15 @@ the document id level. The results can be joined with the document table to get 
 of the speech and then piped in a **ggplot2** command to illustrate how the length of
 the State of the Union has changed over time.
 
-```{r}
+```{r, fig.height = 7, fig.width = 12}
 get_token(sotu) %>%
   group_by(id) %>%
   summarize(n = n()) %>%
-  left_join(get_document(sotu)) %>%
+  left_join(get_document(sotu), by = "id") %>%
   ggplot(aes(year, n)) +
     geom_line(color = grey(0.8)) +
     geom_point(aes(color = sotu_type)) +
-    geom_smooth()
+    geom_smooth(method = 'loess')
 ```
 
 Here, color is used to represent whether the address was given as an oral address or a written
@@ -98,7 +100,7 @@ get_entity(sotu) %>%
   filter(entity_type == "LOCATION") %>%
   group_by(entity) %>%
   summarize(count = n()) %>%
-  top_n(n = 44) %>%
+  top_n(n = 44, count) %>%
   arrange(desc(count)) %>%
   use_series(entity)
 ```
@@ -122,11 +124,11 @@ by George W. Bush in 2001:
 
 ```{r}
 get_dependency(sotu, get_token = TRUE) %>%
-  left_join(get_document(sotu)) %>%
+  left_join(get_document(sotu), by = c("id")) %>%
   filter(year == 2001) %>%
   filter(relation == "dobj") %>%
   select(id = id, start = word, word = lemma_target) %>%
-  left_join(word_frequency) %>%
+  left_join(word_frequency, by = c("word")) %>%
   filter(frequency < 0.0005) %>%
   select(id, start, word) %$%
   sprintf("%s => %s", start, word)
@@ -139,11 +141,11 @@ in focus.
 
 ```{r}
 get_dependency(sotu, get_token = TRUE) %>%
-  left_join(get_document(sotu)) %>%
+  left_join(get_document(sotu), by = c("id")) %>%
   filter(year == 2002) %>%
   filter(relation == "dobj") %>%
   select(id = id, start = word, word = lemma_target) %>%
-  left_join(word_frequency) %>%
+  left_join(word_frequency, by = c("word")) %>%
   filter(frequency < 0.0005) %>%
   select(id, start, word) %$%
   sprintf("%s => %s", start, word)
@@ -185,7 +187,7 @@ library(topicmodels)
 tm <- get_token(sotu) %>%
   filter(pos %in% c("NN", "NNS")) %>%
   get_tfidf(min_df = 0.05, max_df = 0.95, type = "tf", tf_weight = "raw") %$%
-  LDA(tf, k = 16, control = list(verbose = 1))
+  LDA(tf, k = 16, control = list(verbose = 0))
 ```
 
 The topics, ordered by approximate time period, are visualized below:
@@ -208,7 +210,7 @@ additional ``mutate`` function defining a new id illustrates the flexibility of 
 
 ```{r}
 df <- get_token(sotu) %>%
-  left_join(get_document(sotu)) %>%
+  left_join(get_document(sotu), by = "id") %>%
   filter(year > 2000) %>%
   mutate(new_id = paste(id, sid, sep = "-")) %>%
   filter(pos %in% c("NN", "NNS"))
@@ -222,7 +224,7 @@ made in odd numbered years. This is done via a separate table join and a pair of
 
 ```{r}
 meta <- data_frame(new_id = mat$id) %>%
-  left_join(df[!duplicated(df$new_id),]) %>%
+  left_join(df[!duplicated(df$new_id),], by = "new_id") %>%
   mutate(y = as.numeric(president == "Barack Obama")) %>%
   mutate(train = year %in% seq(2001,2016, by = 2))
 ```
@@ -233,9 +235,10 @@ given the binary nature of the response and training is done on only those speec
 occurring in odd-numbered years. Cross-validation is used in order to select the
 best value of the model's tuning parameter.
 
-```{r}
+```{r, message = FALSE}
 library(glmnet)
-model <- cv.glmnet(mat$tf[meta$train,], meta$y[meta$train], family = "binomial")
+model <- cv.glmnet(mat$tf[meta$train,],
+                   meta$y[meta$train], family = "binomial")
 ```
 
 A boxplot of the predicted classes for each address is given below:

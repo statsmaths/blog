@@ -1,11 +1,20 @@
 ---
 layout: post
-title: Initial training set
+title: "Distant Viewing TV: Initial Training Set"
 categories: distanttv
 ---
 
+We construct a training set of labeled scene and shot breaks
+from a single episode of Bewitched. Using this, we are able to
+verify the performance of our shot detector. It also allows us
+to sanity-check our face detector.
+
+**This post is part of a series about the Distant Viewing TV
+project. To see a full list of available posts in the series
+see [Distant Viewing TV: Introduction](../dtv-introduction).**
+
 At this point, we have a prototype for: face detection, face
-disambuguation, and shot detection. These were tested and tuned
+disambiguation, and shot detection. These were tested and tuned
 by randomly applying them over shot snippets of a single episode
 of Bewitch. The next logical step to me seemed to be coding each
 and every shot break in the episode. This way, we can be more

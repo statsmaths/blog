@@ -1,8 +1,16 @@
 ---
 layout: post
-title: Extract Images
+title: "Distant Viewing TV: Extract Images"
 categories: distanttv
 ---
+
+Here, we document the process of extracting fixed images from
+a video file. While this should not have been a difficult task,
+it took several attempts to get correct.
+
+**This post is part of a series about the Distant Viewing TV
+project. To see a full list of available posts in the series
+see [Distant Viewing TV: Introduction](../dtv-introduction).**
 
 Nearly all of the existing algorithms that we want to start
 applying to our data are built to accept still images rather
@@ -22,9 +30,9 @@ by free online converters and one-off, closed source applications:
 ![search results](https://statsmaths.github.io/blog/assets/2017-06-01-dtv-extract-images/img01.jpg)
 
 Scrolling through the first several pages or tweaking the search
-terms did not seem to find a programatic solution that would
+terms did not seem to find a programmatic solution that would
 work inside of an open-source pipeline. My next idea was to
-figure out how to do this from within one of the handfull of
+figure out how to do this from within one of the handful of
 command line programs that handle multimedia formats. I started
 by downloading the VLC media player, commonly identified by its
 orange traffic cone logo. This has turned out to be a great
@@ -48,7 +56,7 @@ proving, I went to the only other media processing program I was
 familiar with: ffmpeg. This is a fairly low-level command line
 tool that has been continuously developed for the past 16 years.
 I knew the program primarily through two people that I worked
-closely with AT&T Labs, both of whom were adamant linux
+closely with AT&T Labs, both of whom were adamant Linux
 commandline users, who used it as a general-purpose media
 player. Getting ffmpeg installed on macOS proved to be a challenge
 in itself. As with any library, my first go-to was to try to
@@ -90,7 +98,8 @@ face:
 With these images in hand we could finally start testing and
 modifying our set of image processing libraries.
 
-
+*The next post in this series is available at:
+[Distant Viewing TV: Introduction](../dtv-face-detection).*
 
 
 

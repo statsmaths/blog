@@ -1,22 +1,28 @@
 ---
 layout: post
-title: Face Detection with OpenFace
+title: "Distant Viewing TV: Face Detection with OpenFace"
 categories: distanttv
 ---
 
+With individual frames extracted from our video files, we
+now turn to the issue of detecting faces in static images.
 
-We would eventually like to extract a sizeable collection
+**This post is part of a series about the Distant Viewing TV
+project. To see a full list of available posts in the series
+see [Distant Viewing TV: Introduction](../dtv-introduction).**
+
+We would eventually like to extract a sizable collection
 of both high and low-level features from moving images. The
-feature we are most excited about is faceial detection.
+feature we are most excited about is facial detection.
 Detecting faces is fairly novel for DH applications, which
 have focused almost entirely on the analysis of shot breaks.
 The location of faces in a shot have the potential give a much
 richer and complete description of what is happening in a shot
 both from the narrative structure and in terms of the visual
 form. If faces could also be tagged with specific character
-names, that even further give quantitiative data about the
+names, that even further give quantitative data about the
 structure of each television show. Given the potential
-benefits, our initial excitement, and the presense of several
+benefits, our initial excitement, and the presence of several
 open-source libraries for this exact task, face detection
 seemed like the most obvious starting point for our analysis.
 
@@ -54,7 +60,7 @@ run a face detector on my extracted images. Previously when using
 Docker to process data on my local file system, I set-up an API
 service on Docker using the python Flask module. This made sense
 because the software would eventually be deployed in production and
-the added infastructure would be useful. In this case, however, all
+the added infrastructure would be useful. In this case, however, all
 of that communication seemed needlessly complicated. The eventual
 plan for the DTV toolkit is to have the entire thing run inside a
 Docker container, so there should be no need to communicate with
@@ -87,7 +93,7 @@ net = openface.TorchNeuralNet(args.networkModel, args.imgDim, cuda=args.cuda)
 dlib is a C++ library that has a fantastic track record,
 but uses some older techniques such as HOG detectors
 rather than neural networks. It would be interesting to
-see how well it stacks up to the propretary algorithms used
+see how well it stacks up to the proprietary algorithms used
 by Facebook, Apple, and Google.
 
 Excited to see the results, I ran the OpenFace library over a few still
@@ -106,7 +112,7 @@ Drew a box around any detected faces, and saved the output as this:
 ![search results](https://statsmaths.github.io/blog/assets/2017-06-08-dtv-face-detection/img07.png)
 
 With only a slight tweak of the code, I also decided to save a version
-of just the face into a seperate file. In our example, the extracted
+of just the face into a separate file. In our example, the extracted
 face is this:
 
 ![search results](https://statsmaths.github.io/blog/assets/2017-06-08-dtv-face-detection/img06.png)
@@ -115,7 +121,7 @@ I then began going through the 1500 output images from this one episode.
 Opening and closing all of these image files was beginning to upset my
 computer, and Previous crashed a few times. Thankfully Lauren showed me
 a great trick with the spacebar on macOS that allowed me to almost play
-the images as if they were a movie. This was a realy time saver and is
+the images as if they were a movie. This was a real time saver and is
 what finally made it possible to see enough images to qualitatively
 evaluate how well it was working. Across the entire episode, we noticed
 three main things about the dlib face detector:
@@ -162,7 +168,7 @@ python, but for fast exploratory data analysis I always come back to R.
 This is probably due to my own comfort in the language than anything else.
 Therefore, I saved the results of the embeddings as a csv and read these
 into R. I wanted to understand how well the embedding was describing each
-face, but this is difficult because I currently have not labelled training
+face, but this is difficult because I currently have not labeled training
 data to test against. So, I instead computed the first two principal
 components of the embeddings and plotted all of the faces in two-dimensions.
 Luckily I had the code for doing this ready to go from a demonstration I
@@ -184,6 +190,8 @@ as well as a strange point right in the middle of the plot that we
 eventually determined was photograph or painting on the wall of Larry's
 office.
 
+*The next post in this series is available at:
+[Distant Viewing TV: Introduction](../dtv-shot-detection).*
 
 
 

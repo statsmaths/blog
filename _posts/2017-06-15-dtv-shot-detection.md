@@ -125,4 +125,4 @@ Even at the higher frame rate, the original metric does a poor job of
 differentiating movement and shot breaks.
 
 *The next post in this series is available at:
-[Distant Viewing TV: Introduction](../dtv-first-training-set).*
+[Distant Viewing TV: Initial Training Set](../dtv-first-training-set).*

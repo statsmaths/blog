@@ -191,7 +191,7 @@ eventually determined was photograph or painting on the wall of Larry's
 office.
 
 *The next post in this series is available at:
-[Distant Viewing TV: Introduction](../dtv-shot-detection).*
+[Distant Viewing TV: Shot Detection](../dtv-shot-detection).*
 
 
 

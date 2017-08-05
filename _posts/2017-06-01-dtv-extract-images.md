@@ -99,7 +99,7 @@ With these images in hand we could finally start testing and
 modifying our set of image processing libraries.
 
 *The next post in this series is available at:
-[Distant Viewing TV: Introduction](../dtv-face-detection).*
+[Distant Viewing TV: Face Detection with OpenFace](../dtv-face-detection).*
 
 
 

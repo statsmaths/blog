@@ -15,17 +15,28 @@ These annotations capture elements of the text such as detecting word
 boundaries, giving base form of words into a base form (i.e., 'dog' is
 the base of the word 'dogs'), and identifying parts of speech. This
 document gives a quick guide to getting started with the recently
-released version (2.0) package.
+released version (2.0) package. Amongst the changes in the new version
+is the includsion of the *udpipe* backend, which allows for parsing
+text without the need to install Python or Java.
+
+## Quickstart
+
+### Step 1: Install package
 
 First, install the latest version of the **cleanNLP** package:
 
 {% highlight r %}
 devtools::install_github("statsmaths/cleanNLP")
 {% endhighlight %}
+You'll need to have a version of cleanNLP >2.0 to follow along
+the rest of this blog post.
+
+### Step 2: Initialize the udpipe backend
+
 We will be using the excellent [udpipe backend](https://cran.r-project.org/web/packages/udpipe/index.html)
-for this tutorial because it requires no external dependencies, is
+for this quickstart because it requires no external dependencies, is
 quite fast, and can produce the majority of available annotation
-tasks. So, let's load the package and initialize the backend:
+tasks. Let's load the package and initialize the backend:
 
 {% highlight r %}
 library(cleanNLP)
@@ -34,37 +45,26 @@ cnlp_init_udpipe()
 The first time you run this, R will download a 16Mb file. It will
 be stored automatically between R sessions.
 
-We are now ready to annotate text with **cleanNLP**. Here, I will
-use a data set the comes from cleanNLP package. The data is stored
-in a data frame with the first column giving the id of the document
-and the second column giving the text of each document (documents
-are individual articles). I will show a truncated version of the
-text to make it clear what the data frame looks like:
+### Step 3: Format the input data
+
+There are many formats for inputing data to cleanNLP package. We
+will use the simpliest format that consists of simply taking a
+character vector containing one element per document. Here I will
+create a small input vector of three well-known quotes:
+
 
 {% highlight r %}
-data(un)
-dplyr::mutate(un, text = substr(text, 1, 45))
+input <- c("It is better to be looked over than overlooked.",
+           "Real stupidity beats artificial intelligence every time.",
+           "The secret of getting ahead is getting started.")
 {% endhighlight %}
 
+You can, of course, create your own input data in any number of
+formats. We are now ready to annotate text with **cleanNLP**.
 
+### Step 4: Annotate the text
 
-{% highlight text %}
-## # A tibble: 30 x 2
-##       doc_id                                          text
-##       <fctr>                                         <chr>
-##  1 article01 All human beings are born free and equal in d
-##  2 article02 Everyone is entitled to all the rights and fr
-##  3 article03 Everyone has the right to life, liberty and s
-##  4 article04 No one shall be held in slavery or servitude;
-##  5 article05 No one shall be subjected to torture or to cr
-##  6 article06 Everyone has the right to recognition everywh
-##  7 article07 All are equal before the law and are entitled
-##  8 article08 Everyone has the right to an effective remedy
-##  9 article09 No one shall be subjected to arbitrary arrest
-## 10 article10 Everyone is entitled in full equality to a fa
-## # ... with 20 more rows
-{% endhighlight %}
-Then, all one needs to do is run `cnlp_annotate_tif` on the `un` object.
+Now we a ready to annotate the input text with the function `cnlp_annotate_tif`:
 
 {% highlight r %}
 anno <- cnlp_annotate_tif(un)
@@ -74,13 +74,13 @@ anno
 
 
 {% highlight text %}
-##
+## 
 ## A CleanNLP Annotation:
 ##   num. documents: 30
 {% endhighlight %}
-There are many things you can do with the annotation object, but for
-most users a good starting place is to turn it into a single data
-frame:
+The output is an annotation object; there are many things you can do with the
+annotation object, but for most users a good starting place is to turn it into
+a single data frame:
 
 {% highlight r %}
 output <- cnlp_get_tif(anno)
@@ -116,56 +116,31 @@ Each row in the output corresponds to a single word in the original
 documents. The `doc_id` column tells us which document the word came
 from and other columns give the annotated information about each word.
 
-In order to use on your own text, you just need to construct a new data
-frame to input. For example, we could take three famous quotes:
+### Step 5: Share and enjoy
 
-{% highlight r %}
-text <- c("It is better to be looked over than overlooked.",
-         "Real stupidity beats artificial intelligence every time.",
-         "The secret of getting ahead is getting started.")
-input <- data.frame(doc_id = c("West", "Pratchett", "Twain"),
-                        text = text,
-                        stringsAsFactors = FALSE)
-{% endhighlight %}
-And then, putting all of the commands together, parse these as:
-
-{% highlight r %}
-library(cleanNLP)
-cnlp_init_udpipe()
-output <- cnlp_get_tif(cnlp_annotate_tif(input))
-{% endhighlight %}
-The output has the output format as above:
-
-{% highlight r %}
-print.data.frame(head(output))
-{% endhighlight %}
-
-
-
-{% highlight text %}
-##   doc_id sid tid   word  lemma upos pos cid pid case definite degree
-## 1   West   1   1     It     it PRON PRP   0   1  Nom     <NA>   <NA>
-## 2   West   1   2     is     be  AUX VBZ   3   1 <NA>     <NA>   <NA>
-## 3   West   1   3 better better  ADJ JJR   6   1 <NA>     <NA>    Cmp
-## 4   West   1   4     to     to PART  TO  13   1 <NA>     <NA>   <NA>
-## 5   West   1   5     be     be  AUX  VB  16   1 <NA>     <NA>   <NA>
-## 6   West   1   6 looked   look VERB VBN  19   1 <NA>     <NA>   <NA>
-##   gender mood number person pron_type tense verb_form voice source
-## 1   Neut <NA>   Sing      3       Prs  <NA>      <NA>  <NA>      3
-## 2   <NA>  Ind   Sing      3      <NA>  Pres       Fin  <NA>      3
-## 3   <NA> <NA>   <NA>   <NA>      <NA>  <NA>      <NA>  <NA>      0
-## 4   <NA> <NA>   <NA>   <NA>      <NA>  <NA>      <NA>  <NA>      6
-## 5   <NA> <NA>   <NA>   <NA>      <NA>  <NA>       Inf  <NA>      6
-## 6   <NA> <NA>   <NA>   <NA>      <NA>  Past      Part  Pass      3
-##   relation word_source lemma_source spaces
-## 1     expl      better       better      1
-## 2      cop      better       better      1
-## 3     root        ROOT         ROOT      1
-## 4     mark      looked         look      1
-## 5 aux:pass      looked         look      1
-## 6    csubj      better       better      1
-{% endhighlight %}
-Check out the next section for more details about how this process can
-be used and customized for your needs.
+The output object above is a data frame and can be stored as a csv file,
+manipulated, and plotted just as any other data frame can in R. Check out
+the next section for more details about how the annotation process outlined
+above can be used and customized for your own needs.
 
 ## Next steps
+
+This guide is meant to show a simple way to get started with the **cleanNLP**
+package. Here are some ideas for moving from this guide to making the best
+of what the package has to offer:
+
+- if you work with non-English language, look at the help pages
+for `cnlp_init_udpipe` to see how to initilize other natural languages
+- for named entities and word vectors, look at using the spacy backend
+in place of udpipe: `cnlp_init_spacy`. It takes a bit more more to set
+up, however, as it requires Python and several Python modules.
+- look into the structure of the raw annotation object; it consists of a
+list of normalized data frames that can be filtered and joined to produce
+sophisticated analyses of data
+
+Future blog posts will highlight particular applications of the package
+to specific textual corpora.
+
+
+
+

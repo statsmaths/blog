@@ -1,0 +1,91 @@
+---
+layout: post
+title: "cleanNLP 2.0: Quickstart Guide"
+categories: rlang
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(eval = TRUE)
+knitr::opts_chunk$set(fig.path = "../assets/2018-01-09-cleanNLP2-quickstart/")
+knitr::opts_chunk$set(fig.height = 5)
+knitr::opts_chunk$set(fig.width = 8.5)
+knitr::opts_chunk$set(out.width = "100%")
+knitr::opts_chunk$set(dpi = 300)
+```
+
+**This post is a draft and will be officially released when
+the updated package is available on CRAN.**
+
+The **cleanNLP** package takes raw text and outputs a structured
+representation of the text annotated with auto-generated annotations.
+These annotations capture elements of the text such as detecting word
+boundaries, giving base form of words into a base form (i.e., 'dog' is
+the base of the word 'dogs'), and identifying parts of speech. This
+document gives a quick guide to getting started with the recently
+released version (2.0) package.
+
+First, install the latest version of the **cleanNLP** package:
+```{r, eval = FALSE}
+devtools::install_github("statsmaths/cleanNLP")
+```
+We will be using the excellent [udpipe backend](https://cran.r-project.org/web/packages/udpipe/index.html)
+for this tutorial because it requires no external dependencies, is
+quite fast, and can produce the majority of available annotation
+tasks. So, let's load the package and initialize the backend:
+```{r, message = FALSE}
+library(cleanNLP)
+cnlp_init_udpipe()
+```
+The first time you run this, R will download a 16Mb file. It will
+be stored automatically between R sessions.
+
+We are now ready to annotate text with **cleanNLP**. Here, I will
+use a data set the comes from cleanNLP package. The data is stored
+in a data frame with the first column giving the id of the document
+and the second column giving the text of each document (documents
+are individual articles). I will show a truncated version of the
+text to make it clear what the data frame looks like:
+```{r}
+data(un)
+dplyr::mutate(un, text = substr(text, 1, 45))
+```
+Then, all one needs to do is run `cnlp_annotate_tif` on the `un` object.
+```{r}
+anno <- cnlp_annotate_tif(un)
+anno
+```
+There are many things you can do with the annotation object, but for
+most users a good starting place is to turn it into a single data
+frame:
+```{r}
+output <- cnlp_get_tif(anno)
+print.data.frame(head(output))
+```
+Each row in the output corresponds to a single word in the original
+documents. The `doc_id` column tells us which document the word came
+from and other columns give the annotated information about each word.
+
+In order to use on your own text, you just need to construct a new data
+frame to input. For example, we could take three famous quotes:
+```{r}
+text <- c("It is better to be looked over than overlooked.",
+         "Real stupidity beats artificial intelligence every time.",
+         "The secret of getting ahead is getting started.")
+input <- data.frame(doc_id = c("West", "Pratchett", "Twain"),
+                        text = text,
+                        stringsAsFactors = FALSE)
+```
+And then, putting all of the commands together, parse these as:
+```{r}
+library(cleanNLP)
+cnlp_init_udpipe()
+output <- cnlp_get_tif(cnlp_annotate_tif(input))
+```
+The output has the output format as above:
+```{r}
+print.data.frame(head(output))
+```
+Check out the next section for more details about how this process can
+be used and customized for your needs.
+
+## Next steps

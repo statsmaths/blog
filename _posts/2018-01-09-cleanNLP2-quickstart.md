@@ -67,16 +67,16 @@ formats. We are now ready to annotate text with **cleanNLP**.
 Now we a ready to annotate the input text with the function `cnlp_annotate_tif`:
 
 {% highlight r %}
-anno <- cnlp_annotate_tif(un)
+anno <- cnlp_annotate(input)
 anno
 {% endhighlight %}
 
 
 
 {% highlight text %}
-## 
+##
 ## A CleanNLP Annotation:
-##   num. documents: 30
+##   num. documents: 3
 {% endhighlight %}
 The output is an annotation object; there are many things you can do with the
 annotation object, but for most users a good starting place is to turn it into
@@ -90,27 +90,27 @@ print.data.frame(head(output))
 
 
 {% highlight text %}
-##      doc_id sid tid   word lemma upos pos cid pid case definite degree
-## 1 article01   1   1    All   all  DET  DT   0   1 <NA>     <NA>   <NA>
-## 2 article01   1   2  human human  ADJ  JJ   4   1 <NA>     <NA>    Pos
-## 3 article01   1   3 beings being NOUN NNS  10   1 <NA>     <NA>   <NA>
-## 4 article01   1   4    are    be  AUX VBP  17   1 <NA>     <NA>   <NA>
-## 5 article01   1   5   born  bear VERB VBN  21   1 <NA>     <NA>   <NA>
-## 6 article01   1   6   free  free  ADJ  JJ  26   1 <NA>     <NA>    Pos
-##   gender mood num_type number person poss pron_type reflex tense verb_form
-## 1   <NA> <NA>     <NA>   <NA>   <NA> <NA>      <NA>   <NA>  <NA>      <NA>
-## 2   <NA> <NA>     <NA>   <NA>   <NA> <NA>      <NA>   <NA>  <NA>      <NA>
-## 3   <NA> <NA>     <NA>   Plur   <NA> <NA>      <NA>   <NA>  <NA>      <NA>
-## 4   <NA>  Ind     <NA>   <NA>   <NA> <NA>      <NA>   <NA>  Pres       Fin
-## 5   <NA> <NA>     <NA>   <NA>   <NA> <NA>      <NA>   <NA>  Past      Part
-## 6   <NA> <NA>     <NA>   <NA>   <NA> <NA>      <NA>   <NA>  <NA>      <NA>
-##   voice source   relation word_source lemma_source spaces
-## 1  <NA>      3        det      beings        being      1
-## 2  <NA>      3       amod      beings        being      1
-## 3  <NA>      5 nsubj:pass        born         bear      1
-## 4  <NA>      5   aux:pass        born         bear      1
-## 5  Pass      0       root        ROOT         ROOT      1
-## 6  <NA>      5       conj        born         bear      1
+##   doc_id sid tid   word  lemma upos pos cid pid case definite degree
+## 1   doc1   1   1     It     it PRON PRP   0   1  Nom     <NA>   <NA>
+## 2   doc1   1   2     is     be  AUX VBZ   3   1 <NA>     <NA>   <NA>
+## 3   doc1   1   3 better better  ADJ JJR   6   1 <NA>     <NA>    Cmp
+## 4   doc1   1   4     to     to PART  TO  13   1 <NA>     <NA>   <NA>
+## 5   doc1   1   5     be     be  AUX  VB  16   1 <NA>     <NA>   <NA>
+## 6   doc1   1   6 looked   look VERB VBN  19   1 <NA>     <NA>   <NA>
+##   gender mood number person pron_type tense verb_form voice source
+## 1   Neut <NA>   Sing      3       Prs  <NA>      <NA>  <NA>      3
+## 2   <NA>  Ind   Sing      3      <NA>  Pres       Fin  <NA>      3
+## 3   <NA> <NA>   <NA>   <NA>      <NA>  <NA>      <NA>  <NA>      0
+## 4   <NA> <NA>   <NA>   <NA>      <NA>  <NA>      <NA>  <NA>      6
+## 5   <NA> <NA>   <NA>   <NA>      <NA>  <NA>       Inf  <NA>      6
+## 6   <NA> <NA>   <NA>   <NA>      <NA>  Past      Part  Pass      3
+##   relation word_source lemma_source spaces
+## 1     expl      better       better      1
+## 2      cop      better       better      1
+## 3     root        ROOT         ROOT      1
+## 4     mark      looked         look      1
+## 5 aux:pass      looked         look      1
+## 6    csubj      better       better      1
 {% endhighlight %}
 Each row in the output corresponds to a single word in the original
 documents. The `doc_id` column tells us which document the word came

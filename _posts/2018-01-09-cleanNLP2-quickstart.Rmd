@@ -70,7 +70,7 @@ formats. We are now ready to annotate text with **cleanNLP**.
 
 Now we a ready to annotate the input text with the function `cnlp_annotate_tif`:
 ```{r}
-anno <- cnlp_annotate_tif(un)
+anno <- cnlp_annotate(input)
 anno
 ```
 The output is an annotation object; there are many things you can do with the

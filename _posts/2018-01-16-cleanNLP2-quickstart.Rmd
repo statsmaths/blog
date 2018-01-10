@@ -81,7 +81,7 @@ output <- cnlp_get_tif(anno)
 print.data.frame(head(output))
 ```
 Each row in the output corresponds to a single word in the original
-documents. The `doc_id` column tells us which document the word came
+documents. The `id` column tells us which document the word came
 from and other columns give the annotated information about each word.
 
 ### Step 5: Share and enjoy

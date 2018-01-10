@@ -74,7 +74,7 @@ anno
 
 
 {% highlight text %}
-##
+## 
 ## A CleanNLP Annotation:
 ##   num. documents: 3
 {% endhighlight %}
@@ -90,27 +90,27 @@ print.data.frame(head(output))
 
 
 {% highlight text %}
-##   doc_id sid tid   word  lemma upos pos cid pid case definite degree
-## 1   doc1   1   1     It     it PRON PRP   0   1  Nom     <NA>   <NA>
-## 2   doc1   1   2     is     be  AUX VBZ   3   1 <NA>     <NA>   <NA>
-## 3   doc1   1   3 better better  ADJ JJR   6   1 <NA>     <NA>    Cmp
-## 4   doc1   1   4     to     to PART  TO  13   1 <NA>     <NA>   <NA>
-## 5   doc1   1   5     be     be  AUX  VB  16   1 <NA>     <NA>   <NA>
-## 6   doc1   1   6 looked   look VERB VBN  19   1 <NA>     <NA>   <NA>
-##   gender mood number person pron_type tense verb_form voice source
-## 1   Neut <NA>   Sing      3       Prs  <NA>      <NA>  <NA>      3
-## 2   <NA>  Ind   Sing      3      <NA>  Pres       Fin  <NA>      3
-## 3   <NA> <NA>   <NA>   <NA>      <NA>  <NA>      <NA>  <NA>      0
-## 4   <NA> <NA>   <NA>   <NA>      <NA>  <NA>      <NA>  <NA>      6
-## 5   <NA> <NA>   <NA>   <NA>      <NA>  <NA>       Inf  <NA>      6
-## 6   <NA> <NA>   <NA>   <NA>      <NA>  Past      Part  Pass      3
-##   relation word_source lemma_source spaces
-## 1     expl      better       better      1
-## 2      cop      better       better      1
-## 3     root        ROOT         ROOT      1
-## 4     mark      looked         look      1
-## 5 aux:pass      looked         look      1
-## 6    csubj      better       better      1
+##     id sid tid   word  lemma upos pos cid pid case definite degree gender
+## 1 doc1   1   1     It     it PRON PRP   0   1  Nom     <NA>   <NA>   Neut
+## 2 doc1   1   2     is     be  AUX VBZ   3   1 <NA>     <NA>   <NA>   <NA>
+## 3 doc1   1   3 better better  ADJ JJR   6   1 <NA>     <NA>    Cmp   <NA>
+## 4 doc1   1   4     to     to PART  TO  13   1 <NA>     <NA>   <NA>   <NA>
+## 5 doc1   1   5     be     be  AUX  VB  16   1 <NA>     <NA>   <NA>   <NA>
+## 6 doc1   1   6 looked   look VERB VBN  19   1 <NA>     <NA>   <NA>   <NA>
+##   mood number person pron_type tense verb_form voice source relation
+## 1 <NA>   Sing      3       Prs  <NA>      <NA>  <NA>      3     expl
+## 2  Ind   Sing      3      <NA>  Pres       Fin  <NA>      3      cop
+## 3 <NA>   <NA>   <NA>      <NA>  <NA>      <NA>  <NA>      0     root
+## 4 <NA>   <NA>   <NA>      <NA>  <NA>      <NA>  <NA>      6     mark
+## 5 <NA>   <NA>   <NA>      <NA>  <NA>       Inf  <NA>      6 aux:pass
+## 6 <NA>   <NA>   <NA>      <NA>  Past      Part  Pass      3    csubj
+##   word_source lemma_source spaces
+## 1      better       better      1
+## 2      better       better      1
+## 3        ROOT         ROOT      1
+## 4      looked         look      1
+## 5      looked         look      1
+## 6      better       better      1
 {% endhighlight %}
 Each row in the output corresponds to a single word in the original
 documents. The `doc_id` column tells us which document the word came

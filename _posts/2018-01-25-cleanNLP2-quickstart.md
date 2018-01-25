@@ -6,17 +6,14 @@ categories: rlang
 
 
 
-**This post is a draft and will be officially released when
-the updated package is available on CRAN.**
-
 The **cleanNLP** package takes raw text and outputs a structured
 representation of the text annotated with auto-generated annotations.
 These annotations capture elements of the text such as detecting word
 boundaries, giving base form of words into a base form (i.e., 'dog' is
 the base of the word 'dogs'), and identifying parts of speech. This
 document gives a quick guide to getting started with the recently
-released version (2.0) package. Amongst the changes in the new version
-is the includsion of the *udpipe* backend, which allows for parsing
+released version (2.0.3) package. Amongst the changes in the new version
+is the inclusion of the *udpipe* backend, which allows for parsing
 text without the need to install Python or Java.
 
 ## Quickstart

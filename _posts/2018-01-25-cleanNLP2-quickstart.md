@@ -26,7 +26,7 @@ text without the need to install Python or Java.
 First, install the latest version of the **cleanNLP** package:
 
 {% highlight r %}
-devtools::install_github("statsmaths/cleanNLP")
+install.packages("cleanNLP")
 {% endhighlight %}
 You'll need to have a version of cleanNLP >2.0 to follow along
 the rest of this blog post.
@@ -48,7 +48,7 @@ be stored automatically between R sessions.
 ### Step 3: Format the input data
 
 There are many formats for inputing data to cleanNLP package. We
-will use the simpliest format that consists of simply taking a
+will use the simplest format that consists of simply taking a
 character vector containing one element per document. Here I will
 create a small input vector of three well-known quotes:
 
@@ -64,7 +64,8 @@ formats. We are now ready to annotate text with **cleanNLP**.
 
 ### Step 4: Annotate the text
 
-Now we a ready to annotate the input text with the function `cnlp_annotate_tif`:
+Now we a ready to annotate the input text with the function
+`cnlp_annotate_tif`:
 
 {% highlight r %}
 anno <- cnlp_annotate(input)
@@ -113,7 +114,7 @@ print.data.frame(head(output))
 ## 6      better       better      1
 {% endhighlight %}
 Each row in the output corresponds to a single word in the original
-documents. The `doc_id` column tells us which document the word came
+documents. The `id` column tells us which document the word came
 from and other columns give the annotated information about each word.
 
 ### Step 5: Share and enjoy
@@ -130,7 +131,7 @@ package. Here are some ideas for moving from this guide to making the best
 of what the package has to offer:
 
 - if you work with non-English language, look at the help pages
-for `cnlp_init_udpipe` to see how to initilize other natural languages
+for `cnlp_init_udpipe` to see how to initialize other natural languages
 - for named entities and word vectors, look at using the spacy backend
 in place of udpipe: `cnlp_init_spacy`. It takes a bit more more to set
 up, however, as it requires Python and several Python modules.
